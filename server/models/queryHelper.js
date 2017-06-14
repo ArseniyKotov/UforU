@@ -17,8 +17,8 @@ var asyncMap = function(tasks, cb) {
 
 var querySchoolTable = function(column, value, cb) {
   if (column === 'tuition') {
-    column = column.replace(/\$/g, '');
-    column = column.replace(/,/g, '');
+    value = value.replace(/\$/g, '');
+    value = value.replace(/,/g, '');
     let max = value;
     connection.query('SELECT * FROM Universities WHERE ' + connection.escapeId(column) + ' < ?', [value], function(err, results, fields) {
       if (err) {
@@ -47,6 +47,14 @@ var querySchoolTable = function(column, value, cb) {
         }
       });
     }
+  } else if (column === 'average_gpa') {
+    connection.query('SELECT * FROM Universities WHERE ' + connection.escapeId(column) + ' < ?', [value], function(err, results, fields) {
+      if (err) {
+        cb(err, null);
+      } else {
+        cb(null, results);
+      }
+    });
   } else {
     connection.query('SELECT * FROM Universities WHERE ' + connection.escapeId(column) + ' = ?', [value], function(err, results, fields) {
       if (err) {
@@ -82,9 +90,9 @@ var mySearchFunction = function(prefs, cb) {
       var schoolMax = null;
     }
     
-    arrOfData = _.flatten(arrOfData);
     arrOfData = JSON.parse(JSON.stringify(arrOfData));
-
+    arrOfData = _.flatten(arrOfData);
+    
     if (inputTuition && (schoolMax && schoolMin)) {
 
       inputTuition = inputTuition.replace(/\$/g, '');
@@ -94,10 +102,12 @@ var mySearchFunction = function(prefs, cb) {
         return school.tuition <= inputTuition && (schoolMin <= school.size && school.size <= schoolMax);
       });
 
-      cb(null, results);
+      results = _.uniq(results, 'id');
+
+      results = _.sortBy(results, 'average_gpa');
+      cb(null, results.reverse());
 
     } else if (inputTuition && !(schoolMax && schoolMin)) {
-
       inputTuition = inputTuition.replace(/\$/g, '');
       inputTuition = inputTuition.replace(/,/g, '');
 
@@ -105,7 +115,9 @@ var mySearchFunction = function(prefs, cb) {
         return school.tuition <= inputTuition;
       });
 
-      cb(null, results);
+      results = _.uniq(results, 'id');
+      results = _.sortBy(results, 'average_gpa');
+      cb(null, results.reverse());
 
     } else if (!inputTuition && (schoolMax && schoolMin)) {
 
@@ -113,11 +125,17 @@ var mySearchFunction = function(prefs, cb) {
         return (schoolMin <= school.size) && (school.size <= schoolMax);
       });
 
-      cb(null, results);
+      results = _.uniq(results, 'id');
+      results = _.sortBy(results, 'average_gpa');
+      cb(null, results.reverse());
       
     } else {
       
-      cb(null, arrOfData);
+      var results = arrOfData;
+
+      results = _.uniq(results, 'id');
+      results = _.sortBy(results, 'average_gpa');
+      cb(null, results.reverse());
 
     }
   });

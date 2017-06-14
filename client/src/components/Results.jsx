@@ -1,20 +1,24 @@
 import React from 'react';
-import ResultsList from './ResultsList.jsx';
+import ResultListEntry from './ResultListEntry.jsx';
+import $ from 'jquery';
+import _ from 'lodash';
+
 
 class Results extends React.Component {
   constructor(props) {
     super(props);
+    console.log(this.props.colleges);
   }
 
   render() {
     return (
-       <div>
-        <h5>Results</h5>
-        <ResultsList />
+      <div>
+        {this.props.colleges.map((college, i) => {
+          return <ResultListEntry key={i} college={college} />;
+        })}
       </div>
     );
   }
-
 }
 
 export default Results;

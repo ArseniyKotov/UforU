@@ -1,56 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import $ from 'jquery';
-import Survey from './components/Survey.jsx';
-import Results from './components/Results.jsx';
-import axios from 'axios';
+import { BrowserRouter as Router, Route} from 'react-router-dom';
+import Login from './components/Login.jsx';
+import Signup from './components/Signup.jsx';
+import Favorites from './components/Favorites.jsx';
+import Container from './container.jsx';
+import Logout from './components/Logout.jsx';
+import Home from './components/Home.jsx';
 
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.sendSurveyInfo = this.sendSurveyInfo.bind(this);
-  }
-
-  sendSurveyInfo(userData) {
-    console.log('axios data:', userData);
-    axios({
-      url: '/api/colleges/suggestions',
-      method: 'POST',
-      data: userData,
-    })
-      .then ((results) => {
-        console.log('axios results: ', results);
-      })
-      .catch ((error) => {
-        console.log(error);
-      });
-  }
-
-  // sendSurveyInfo(userData) {
-  //   $.ajax({
-  //     url: '/api/colleges/suggestions',
-  //     method: 'POST',
-  //     data: userData,
-  //     success: (results) => {
-  //       console.log('ajax results: ', results);
-  //     },
-  //     error: (error) => {
-  //       console.log(error);
-  //     }
-  //   });
-  // }
-
-  render() {
-    return (
-      <div>
-        <h1>UForU</h1>
-        <Survey sendSurveyInfo = {this.sendSurveyInfo}/>
-        <Results />
-      </div>
-    );
-  }
-}
-
-ReactDOM.render(<App />, document.getElementById('app'));
+ReactDOM.render(
+  <Router>
+    <div>
+      <Route exact path="/" component={Container} />
+      <Route path="/home" component={Home} />
+      <Route path="/login" component={Login} />
+      <Route path="/signup" component={Signup} />
+      <Route path="/favorites" component={Favorites} />
+      <Route path="/logout" component={Logout} />
+    </div>
+  </Router>, document.getElementById('app'));
